@@ -4,8 +4,8 @@ import { validateCreateVote } from '../middlewares/votes.js';
 
 const route = express.Router();
 
-route.route('/:id/votes', [validateCreateVote])
+route.route('/:id/votes/:judge_id')
   .get(VotesController.getVoteById)
-  .post(VotesController.createVote);
+  .post([validateCreateVote], VotesController.createVote);
 
 export default route;
