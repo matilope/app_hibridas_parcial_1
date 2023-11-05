@@ -5,10 +5,12 @@ import { validateCreateGame, validateUpdateGame } from '../middlewares/games.js'
 
 const route = express.Router();
 
-route.get('/games', GamesController.getGames);
-route.post('/games', [validateCreateGame], GamesController.createGame);
-route.patch('/games/:id', [validateUpdateGame], GamesController.updateGame);
-route.get('/games/:id', GamesController.getGameById);
+route.route('/games')
+  .get(GamesController.getGames)
+  .post([validateCreateGame], GamesController.createGame);
+route.route('/games/:id')
+  .get(GamesController.getGameById)
+  .patch([validateUpdateGame], GamesController.updateGame);
 
 route.use('/games', GamesVotesRoute);
 
