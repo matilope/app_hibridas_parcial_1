@@ -1,4 +1,4 @@
-import { GameCreateSchema } from "../schemas/games.js";
+import { GameCreateSchema, GameUpdateSchema } from "../schemas/games.js";
 
 function validateCreateGame(req, res, next) {
   GameCreateSchema.validate(req.body, {
@@ -15,7 +15,7 @@ function validateCreateGame(req, res, next) {
 }
 
 function validateUpdateGame(req, res, next) {
-  GameCreateSchema.validate(req.body, {
+  GameUpdateSchema.validate(req.body, {
     stripUnknown: true,
     abortEarly: false
   })
