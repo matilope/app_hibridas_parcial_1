@@ -5,6 +5,13 @@ export const GameCreateSchema = yup.object({
   genre: yup.string().required(),
   members:  yup.array().of(yup.string()).required(),
   edition:  yup.number().required()
+  /*
+  average_qualification: yup.object().shape({
+    average_gameplay: yup.number(),
+    average_art: yup.number(),
+    average_sound: yup.number(),
+    average_affinity: yup.number()
+  })*/
 });
 
 export const GameUpdateSchema = yup.object({

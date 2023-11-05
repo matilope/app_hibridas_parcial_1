@@ -1,9 +1,19 @@
 import VotesServices from '../services/votes.js';
 
-async function getVoteById(req, res) {
-  const { id } = req.params;
+async function getVotes(req, res) {
+  const { game_id } = req.params;
   try {
-    const vote = await VotesServices.getVoteById(id);
+    const votes = await VotesServices.getVotes(game_id);
+    res.status(200).json(votes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+async function getVoteById(req, res) {
+  const { game_id } = req.params;
+  try {
+    const vote = await VotesServices.getVoteById(game_id);
     res.status(200).json(vote);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -11,22 +21,35 @@ async function getVoteById(req, res) {
 }
 
 async function createVote(req, res) {
-  const { id, judge_id } = req.params;
+  const { game_id } = req.params;
   try {
-    const createdVote = await VotesServices.createVote(id, judge_id, req.body);
-    console.log(createdVote);
+    const createdVote = await VotesServices.createVote(game_id, req.body);
     res.status(201).json(createdVote);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 }
 
+async function getAverage(req, res) {
+  const { game_id } = req.params;
+  try {
+    const getAverga = await VotesServices.getAverage(game_id);
+    res.status(201).json(getAverga);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 export default {
+  getVotes,
   getVoteById,
-  createVote
+  createVote,
+  getAverage
 }
 
 export {
+  getVotes,
   getVoteById,
-  createVote
+  createVote,
+  getAverage
 }

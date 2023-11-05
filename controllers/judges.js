@@ -19,6 +19,16 @@ async function getJudgeById(req, res) {
   }
 }
 
+async function getJudgeVotesById(req, res) {
+  const { id } = req.params;
+  try {
+    const judge = await JudgeServices.getJudgeVotesById(id);
+    res.status(200).json(judge);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 async function createJudge(req, res) {
   try {
     const createdJudge = await JudgeServices.createJudge(req.body);
@@ -31,11 +41,13 @@ async function createJudge(req, res) {
 export default {
   getJudges,
   getJudgeById,
-  createJudge
+  createJudge,
+  getJudgeVotesById
 }
 
 export {
   getJudges,
   getJudgeById,
-  createJudge
+  createJudge,
+  getJudgeVotesById
 }

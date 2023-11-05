@@ -1,8 +1,10 @@
 import { MongoClient, ObjectId } from "mongodb";
+import { getGameById } from './games.js';
 
 const client = new MongoClient("mongodb://127.0.0.1:27017");
 const db = client.db("GameJAM");
 const JudgeCollection = db.collection('judges');
+const GamesVotesCollection = db.collection("votes");
 
 async function getJudges() {
   await client.connect();
@@ -11,7 +13,26 @@ async function getJudges() {
 
 async function getJudgeById(id) {
   await client.connect();
-  return JudgeCollection.findOne({ _id: new ObjectId(id) });
+  const judge = await JudgeCollection.findOne({ _id: new ObjectId(id) });
+  return judge;
+}
+
+async function getJudgeVotesById(id) {
+  await client.connect();
+  const judgeVotes = await GamesVotesCollection.find({ judge_id: new ObjectId(id) }).toArray();
+  const judgeInfo = {
+    judge_id: id,
+    votes: []
+  };
+  for (const { game_id, categories } of judgeVotes) {
+    const { name } = await getGameById(game_id);
+    const voteInfo = {
+      game_name: name,
+      categories
+    };
+    judgeInfo.votes.push(voteInfo);
+  }
+  return judgeInfo;
 }
 
 async function createJudge(judge) {
@@ -23,11 +44,13 @@ async function createJudge(judge) {
 export {
   getJudges,
   getJudgeById,
-  createJudge
+  createJudge,
+  getJudgeVotesById
 }
 
 export default {
   getJudges,
   getJudgeById,
-  createJudge
+  createJudge,
+  getJudgeVotesById
 }
