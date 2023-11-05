@@ -12,9 +12,9 @@ async function getVotes(idGame) {
   return GamesVotesCollection.find({ game_id: new ObjectId(idGame) }).toArray();
 }
 
-async function getVoteById(idGame) {
+async function getVotesByJudgeId(idJudge) {
   await client.connect();
-  return GamesVotesCollection.find({ game_id: new ObjectId(idGame) }).toArray();
+  return GamesVotesCollection.find({ judge_id: new ObjectId(idJudge) }).toArray();
 }
 
 async function createVote(idGame, vote) {
@@ -60,21 +60,20 @@ async function getAverage(idGame) {
       },
     },
   ];
-
   const categoryAverages = await GamesVotesCollection.aggregate(pipeline).toArray();
   return categoryAverages;
 }
 
 export default {
   getVotes,
-  getVoteById,
+  getVotesByJudgeId,
   createVote,
   getAverage
 }
 
 export {
   getVotes,
-  getVoteById,
+  getVotesByJudgeId,
   createVote,
   getAverage
 }

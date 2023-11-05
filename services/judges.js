@@ -1,10 +1,10 @@
 import { MongoClient, ObjectId } from "mongodb";
 import { getGameById } from './games.js';
+import { getVotesByJudgeId } from "./votes.js";
 
 const client = new MongoClient("mongodb://127.0.0.1:27017");
 const db = client.db("GameJAM");
 const JudgeCollection = db.collection('judges');
-const GamesVotesCollection = db.collection("votes");
 
 async function getJudges() {
   await client.connect();
@@ -19,7 +19,7 @@ async function getJudgeById(id) {
 
 async function getJudgeVotesById(id) {
   await client.connect();
-  const judgeVotes = await GamesVotesCollection.find({ judge_id: new ObjectId(id) }).toArray();
+  const judgeVotes = await getVotesByJudgeId(id);
   const judgeInfo = {
     judge_id: id,
     votes: []

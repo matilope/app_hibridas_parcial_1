@@ -10,10 +10,10 @@ async function getVotes(req, res) {
   }
 }
 
-async function getVoteById(req, res) {
-  const { game_id } = req.params;
+async function getVotesByJudgeId(req, res) {
+  const { judge_id } = req.params;
   try {
-    const vote = await VotesServices.getVoteById(game_id);
+    const vote = await VotesServices.getVotesByJudgeId(judge_id);
     res.status(200).json(vote);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -42,14 +42,14 @@ async function getAverage(req, res) {
 
 export default {
   getVotes,
-  getVoteById,
+  getVotesByJudgeId,
   createVote,
   getAverage
 }
 
 export {
   getVotes,
-  getVoteById,
+  getVotesByJudgeId,
   createVote,
   getAverage
 }

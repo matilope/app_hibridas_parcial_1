@@ -19,7 +19,8 @@ async function getGameById(id) {
 
 async function updateGame(id, game) {
   await client.connect();
-  return GameCollection.updateOne({ _id: new ObjectId(id) }, { $set: game });
+  await GameCollection.updateOne({ _id: new ObjectId(id) }, { $set: game });
+  return game;
 }
 
 async function createGame(game) {
