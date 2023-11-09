@@ -1,5 +1,4 @@
 import { MongoClient, ObjectId } from "mongodb";
-import { getGameById } from './games.js';
 import { getVotesByJudgeId } from "./votes.js";
 
 const client = new MongoClient("mongodb://127.0.0.1:27017");
@@ -23,11 +22,10 @@ async function getJudgeVotesById(id) {
   const judgeInfo = {
     judge_id: id,
     votes: []
-  };
-  for (const { game_id, categories } of judgeVotes) {
-    const { name } = await getGameById(game_id);
+  }
+  for (const { game_name, categories } of judgeVotes) {
     const voteInfo = {
-      game_name: name,
+      game_name,
       categories
     };
     judgeInfo.votes.push(voteInfo);

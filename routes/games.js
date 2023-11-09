@@ -8,6 +8,7 @@ const route = express.Router();
 route.route('/games')
   .get(GamesController.getGames)
   .post([validateCreateGame], GamesController.createGame);
+route.get('/games/edition', GamesController.getGamesOrderByScore)
 route.route('/games/:id')
   .get(GamesController.getGameById)
   .patch([validateUpdateGame], GamesController.updateGame);

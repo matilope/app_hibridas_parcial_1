@@ -4,12 +4,9 @@ const client = new MongoClient("mongodb://127.0.0.1:27017");
 const db = client.db("GameJAM");
 const GameCollection = db.collection('games');
 
-async function getGames(filter = {}) {
+async function getGames() {
   await client.connect();
-  if (filter.length) {
-    filter = { genre: { $regex: filter, $options: "i" } }
-  }
-  return GameCollection.find(filter).toArray();
+  return GameCollection.find({}).toArray();
 }
 
 async function getGameById(id) {
@@ -25,20 +22,32 @@ async function updateGame(id, game) {
 
 async function createGame(game) {
   await client.connect();
+  game.totalScore = 0;
   await GameCollection.insertOne(game);
   return game;
 }
+
+async function getGamesOrderByScore(filter = {}) {
+  await client.connect();
+  if (filter.length) {
+    filter = { genre: { $regex: filter, $options: "i" } }
+  }
+  return GameCollection.find(filter).sort({totalScore: -1}).toArray();
+}
+
 
 export {
   getGames,
   getGameById,
   updateGame,
-  createGame
+  createGame,
+  getGamesOrderByScore
 }
 
 export default {
   getGames,
   getGameById,
   updateGame,
-  createGame
+  createGame,
+  getGamesOrderByScore
 }

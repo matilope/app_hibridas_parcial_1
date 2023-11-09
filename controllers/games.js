@@ -1,9 +1,8 @@
 import * as GameServices from '../services/games.js';
 
 async function getGames(req, res) {
-  const { genre } = req.query;
   try {
-    const games = await GameServices.getGames(genre ?? {});
+    const games = await GameServices.getGames();
     res.status(200).json(games);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -39,16 +38,28 @@ async function createGame(req, res) {
   }
 }
 
+async function getGamesOrderByScore(req, res) {
+  const { genre } = req.query;
+  try {
+    const games = await GameServices.getGamesOrderByScore(genre ?? {});
+    res.status(200).json(games);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 export default {
   getGames,
   getGameById,
   updateGame,
-  createGame
+  createGame,
+  getGamesOrderByScore
 }
 
 export {
   getGames,
   getGameById,
   updateGame,
-  createGame
+  createGame,
+  getGamesOrderByScore
 }

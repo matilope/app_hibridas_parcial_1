@@ -1,6 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import { getJudgeById } from './judges.js';
-import { getGameById } from './games.js';
+import { getGameById, updateGame } from './games.js';
 
 const client = new MongoClient('mongodb://127.0.0.1:27017');
 const db = client.db("GameJAM");
@@ -32,12 +32,18 @@ async function createVote(idGame, vote) {
   if (judgeAlreadyVotedOnThisGame) {
     throw new Error("El juez ya votó en este juego");
   }
+  let gameScore = gameExist.totalScore || 0;
+  for (const key in vote.categories) {
+    gameScore += vote.categories[key];
+  }
+  await updateGame(idGame, { totalScore: gameScore });
   const { name } = await getJudgeById(idJudge);
   const newVote = {
     ...vote,
     judge_id: idJudge,
     judge_name: name,
-    game_id: new ObjectId(idGame)
+    game_id: new ObjectId(idGame),
+    game_name: gameExist.name
   }
   await GamesVotesCollection.insertOne(newVote);
   return newVote;
@@ -45,23 +51,25 @@ async function createVote(idGame, vote) {
 
 async function getAverage(idGame) {
   const game = await getGameById(idGame);
-  const pipeline = [
-    {
-      $match: { game_id: new ObjectId(idGame) },
-    },
-    {
-      $group: {
-        _id: "$game_id",
-        game: { $first: game },
-        averageGameplay: { $avg: "$categories.gameplay" },
-        averageArt: { $avg: "$categories.art" },
-        averageSound: { $avg: "$categories.sound" },
-        averageAffinity: { $avg: "$categories.affinity" },
-      },
-    },
-  ];
-  const categoryAverages = await GamesVotesCollection.aggregate(pipeline).toArray();
-  return categoryAverages;
+  const votes = await GamesVotesCollection.find({ game_id: new ObjectId(idGame) }).toArray();
+  if (votes.length) {
+    throw new Error(`El juego ${game.name} no tiene votaciones`);
+  }
+  let totalGameplay = 0, totalArt = 0, totalSound = 0, totalAffinity = 0;
+  for (const { categories } of votes) {
+    totalGameplay += categories.gameplay;
+    totalArt += categories.art;
+    totalSound += categories.sound;
+    totalAffinity += categories.affinity;
+  }
+  return {
+    _id: game._id,
+    game: game,
+    averageGameplay: (totalGameplay / votes.length),
+    averageArt: (totalArt / votes.length),
+    averageSound: (totalSound / votes.length),
+    averageAffinity: (totalAffinity / votes.length)
+  }
 }
 
 export default {
