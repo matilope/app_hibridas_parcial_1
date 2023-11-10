@@ -20,18 +20,7 @@ async function getVotesByJudgeId(idJudge) {
 async function createVote(idGame, vote) {
   await client.connect();
   const idJudge = new ObjectId(vote.judge_id);
-  const judgeExist = await getJudgeById(idJudge);
-  if (!judgeExist) {
-    throw new Error("El juez no existe");
-  }
-  const gameExist = await getGameById(idGame);
-  if (!gameExist) {
-    throw new Error("El juego no existe");
-  }
-  const judgeAlreadyVotedOnThisGame = await GamesVotesCollection.findOne({ game_id: new ObjectId(idGame), judge_id: idJudge });
-  if (judgeAlreadyVotedOnThisGame) {
-    throw new Error("El juez ya votó en este juego");
-  }
+  const gameExist = await validations(idGame, idJudge);
   let gameScore = gameExist.totalScore || 0;
   for (const key in vote.categories) {
     gameScore += vote.categories[key];
@@ -50,9 +39,9 @@ async function createVote(idGame, vote) {
 }
 
 async function getAverage(idGame) {
-  const game = await getGameById(idGame);
+  const game = await validations(idGame, null);
   const votes = await GamesVotesCollection.find({ game_id: new ObjectId(idGame) }).toArray();
-  if (votes.length) {
+  if (!votes.length) {
     throw new Error(`El juego ${game.name} no tiene votaciones`);
   }
   let totalGameplay = 0, totalArt = 0, totalSound = 0, totalAffinity = 0;
@@ -69,6 +58,28 @@ async function getAverage(idGame) {
     averageArt: (totalArt / votes.length),
     averageSound: (totalSound / votes.length),
     averageAffinity: (totalAffinity / votes.length)
+  }
+}
+
+async function validations(idGame, idJudge) {
+  if (idGame && idJudge) {
+    const judgeAlreadyVotedOnThisGame = await GamesVotesCollection.findOne({ game_id: new ObjectId(idGame), judge_id: idJudge });
+    if (judgeAlreadyVotedOnThisGame) {
+      throw new Error("El juez ya votó en este juego");
+    }
+  }
+  if (idJudge) {
+    const judgeExist = await getJudgeById(idJudge);
+    if (!judgeExist) {
+      throw new Error("El juez no existe");
+    }
+  }
+  if (idGame) {
+    const gameExist = await getGameById(idGame);
+    if (!gameExist) {
+      throw new Error("El juego no existe");
+    }
+    return gameExist;
   }
 }
 

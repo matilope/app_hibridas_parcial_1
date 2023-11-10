@@ -12,8 +12,7 @@ async function getJudges() {
 
 async function getJudgeById(id) {
   await client.connect();
-  const judge = await JudgeCollection.findOne({ _id: new ObjectId(id) });
-  return judge;
+  return JudgeCollection.findOne({ _id: new ObjectId(id) });
 }
 
 async function getJudgeVotesById(id) {
